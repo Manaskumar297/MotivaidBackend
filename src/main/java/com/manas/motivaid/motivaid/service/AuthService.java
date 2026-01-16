@@ -25,11 +25,19 @@ public class AuthService {
     @Autowired private UserRepository userRepository;
     @Autowired private RoleRepository roleRepository;
     @Autowired private JwtService jwtService;
+    @Autowired private OtpService otpService;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public AuthResponse signup(SignupRequest request) {
-        if (userRepository.findByEmailId(request.getEmail_id()).isPresent()) {
+        String email = request.getEmail_id();
+
+        // Check if email is verified
+        if (!otpService.isEmailVerified(email)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email not verified. Please verify your OTP first.");
+        }
+
+        if (userRepository.findByEmailId(email).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
         }
 
@@ -39,7 +47,7 @@ public class AuthService {
         User user = new User();
         user.setFirst_name(request.getFirst_name());
         user.setLast_name(request.getLast_name());
-        user.setEmailId(request.getEmail_id());
+        user.setEmailId(email);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhone_number(request.getPhone_number());
         user.setCity(request.getCity());
@@ -54,6 +62,7 @@ public class AuthService {
 
         return new AuthResponse(toUserResponse(user), token);
     }
+
 
     public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmailId(request.getEmail())
