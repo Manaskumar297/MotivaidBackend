@@ -2,14 +2,18 @@ package com.manas.motivaid.motivaid.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.manas.motivaid.motivaid.dto.AuthResponse;
+import com.manas.motivaid.motivaid.dto.CommonResponse;
 import com.manas.motivaid.motivaid.dto.LoginRequest;
+import com.manas.motivaid.motivaid.dto.ResetpasswordRequest;
 import com.manas.motivaid.motivaid.dto.SignupRequest;
 import com.manas.motivaid.motivaid.dto.UserResponse;
+import com.manas.motivaid.motivaid.enums.OtpType;
 import com.manas.motivaid.motivaid.model.Role;
 import com.manas.motivaid.motivaid.model.User;
 import com.manas.motivaid.motivaid.repository.RoleRepository;
@@ -95,4 +99,23 @@ public class AuthService {
                 user.getRoles().stream().map(Role::getName).collect(Collectors.toSet())
         );
     }
+    
+    public CommonResponse resetPassword(ResetpasswordRequest request) {
+    	
+    	System.out.println(request.toString());
+    	   // 1️⃣ Check if the email has been verified for RESET_PASSWORD OTP
+        if (!otpService.isOtpVerified(request.getEmail(), OtpType.RESET_PASSWORD)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, 
+                    "Email not verified. Please verify your OTP first.");
+        }
+    	User user=userRepository.findByEmailId(request.getEmail())
+    			.orElseThrow(()-> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Email not exists"));
+    	
+    	String encodedPassword = passwordEncoder.encode(request.getPassword());
+    	user.setPassword(encodedPassword);
+    	userRepository.save(user);
+    	return CommonResponse.success("Password updated successfully for " + request.getEmail());
+    }
+    
+  
 }

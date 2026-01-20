@@ -6,46 +6,52 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.manas.motivaid.motivaid.dto.CommonResponse;
+import com.manas.motivaid.motivaid.enums.OtpType;
 import com.manas.motivaid.motivaid.model.EmailOtp;
 import com.manas.motivaid.motivaid.repository.EmailOtpRepository;
+import com.manas.motivaid.motivaid.repository.UserRepository;
 
 @Service
 public class OtpService {
 
-    @Autowired
-    private EmailOtpRepository emailOtpRepository;
-    @Autowired
-    private EmailService emailService;
+    @Autowired private EmailOtpRepository emailOtpRepository;
+    @Autowired private EmailService emailService;
+    @Autowired private UserRepository userRepository;
 
     private String generateOtp() {
         return String.format("%06d", new Random().nextInt(999999));
     }
 
-    public String createOtp(String email) {
+    public CommonResponse createOtp(String email, OtpType otpType) {
+
+        // Block signup OTP if user already exists
+        if (otpType == OtpType.SIGNUP &&
+            userRepository.findByEmailId(email).isPresent()) {
+            return CommonResponse.failure("Email already registered");
+        }
 
         EmailOtp otp = emailOtpRepository
-                .findByEmailAndVerifiedFalse(email)
+                .findByEmailAndOtpType(email, otpType)
                 .orElse(new EmailOtp());
 
         otp.setEmail(email);
         otp.setOtp(generateOtp());
+        otp.setOtpType(otpType);
         otp.setCreatedAt(LocalDateTime.now());
         otp.setVerified(false);
 
         emailOtpRepository.save(otp);
-        // ✅ Send email
+
         emailService.sendOtpEmail(email, otp.getOtp());
 
-        // TEMP: Console log (replace with email sender)
-        System.out.println("OTP for " + email + " : " + otp.getOtp());
-
-        return "otp sent to"+email;
+        return CommonResponse.success("OTP sent to"+ email);
     }
 
-    public Boolean verifyOtp(String email, String otp) {
+    public CommonResponse verifyOtp(String email, String otp, OtpType otpType) {
 
         EmailOtp emailOtp = emailOtpRepository
-                .findByEmailAndOtp(email, otp)
+                .findByEmailAndOtpTypeAndOtp(email, otpType, otp)
                 .orElseThrow(() -> new RuntimeException("Invalid OTP"));
 
         if (emailOtp.isExpired()) {
@@ -54,12 +60,21 @@ public class OtpService {
 
         emailOtp.setVerified(true);
         emailOtpRepository.save(emailOtp);
-       
 
-        return true;
+        return CommonResponse.success("Verified Sucessfully");
     }
 
     public boolean isEmailVerified(String email) {
-        return emailOtpRepository.findByEmailAndVerifiedFalse(email).isEmpty();
+        return emailOtpRepository
+                .findByEmailAndOtpType(email, OtpType.SIGNUP)
+                .map(EmailOtp::isVerified)
+                .orElse(false);
     }
+    public boolean isOtpVerified(String email, OtpType otpType) {
+        EmailOtp otp = emailOtpRepository.findByEmailAndOtpType(email, otpType)
+                .orElseThrow(() -> new RuntimeException("Verify otp first"));
+        return otp.isVerified();
+    }
+
 }
+

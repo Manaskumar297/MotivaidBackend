@@ -3,6 +3,7 @@ package com.manas.motivaid.motivaid.security.jwt;
 import java.security.Key;
 import java.util.Date;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Jwts;
@@ -32,5 +33,10 @@ public class JwtService {
                 .getBody()
                 .getSubject();
     }
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        String email = extractEmail(token);
+        return email.equals(userDetails.getUsername());
+    }
+    
 }
 
