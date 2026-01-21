@@ -63,7 +63,8 @@ public class AuthService {
         user.setToken(token);
 
         userRepository.save(user);
-
+        
+        otpService.deleteOtp(request.getEmail_id(), OtpType.SIGNUP);
         return new AuthResponse(toUserResponse(user), token);
     }
 
@@ -114,6 +115,7 @@ public class AuthService {
     	String encodedPassword = passwordEncoder.encode(request.getPassword());
     	user.setPassword(encodedPassword);
     	userRepository.save(user);
+    	otpService.deleteOtp(user.getEmailId(), OtpType.RESET_PASSWORD);
     	return CommonResponse.success("Password updated successfully for " + request.getEmail());
     }
     

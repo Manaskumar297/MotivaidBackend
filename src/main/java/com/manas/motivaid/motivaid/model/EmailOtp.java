@@ -47,6 +47,7 @@ public class EmailOtp {
     private boolean verified;
 
     public boolean isExpired() {
+        if (createdAt == null) return true;
         return createdAt.plusMinutes(10).isBefore(LocalDateTime.now());
     }
 }

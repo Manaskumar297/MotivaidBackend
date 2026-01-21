@@ -8,14 +8,20 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.manas.motivaid.motivaid.security.jwt.JwtAuthenticationFilter;
+import com.manas.motivaid.motivaid.security.jwt.JwtAuthenticationEntryPoint;
 
 @Configuration
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint
+    ) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 
     @Bean
@@ -23,6 +29,10 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
+
+            .exceptionHandling(ex ->
+                ex.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            )
 
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -44,4 +54,3 @@ public class SecurityConfig {
         return http.build();
     }
 }
-

@@ -37,6 +37,6 @@ public class JwtService {
         String email = extractEmail(token);
         return email.equals(userDetails.getUsername());
     }
-    
+
 }
 

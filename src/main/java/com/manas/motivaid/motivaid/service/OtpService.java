@@ -4,13 +4,17 @@ import java.time.LocalDateTime;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.manas.motivaid.motivaid.dto.CommonResponse;
 import com.manas.motivaid.motivaid.enums.OtpType;
 import com.manas.motivaid.motivaid.model.EmailOtp;
 import com.manas.motivaid.motivaid.repository.EmailOtpRepository;
 import com.manas.motivaid.motivaid.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class OtpService {
@@ -25,9 +29,7 @@ public class OtpService {
 
     public CommonResponse createOtp(String email, OtpType otpType) {
 
-        // Block signup OTP if user already exists
-        if (otpType == OtpType.SIGNUP &&
-            userRepository.findByEmailId(email).isPresent()) {
+        if (otpType == OtpType.SIGNUP && userRepository.findByEmailId(email).isPresent()) {
             return CommonResponse.failure("Email already registered");
         }
 
@@ -45,23 +47,26 @@ public class OtpService {
 
         emailService.sendOtpEmail(email, otp.getOtp());
 
-        return CommonResponse.success("OTP sent to"+ email);
+        return CommonResponse.success("OTP sent to " + email);
     }
 
     public CommonResponse verifyOtp(String email, String otp, OtpType otpType) {
-
         EmailOtp emailOtp = emailOtpRepository
                 .findByEmailAndOtpTypeAndOtp(email, otpType, otp)
-                .orElseThrow(() -> new RuntimeException("Invalid OTP"));
+                .orElse(null);
+
+        if (emailOtp == null) {
+            return CommonResponse.failure("Invalid OTP");
+        }
 
         if (emailOtp.isExpired()) {
-            throw new RuntimeException("OTP expired");
+            return CommonResponse.failure("OTP expired");
         }
 
         emailOtp.setVerified(true);
         emailOtpRepository.save(emailOtp);
 
-        return CommonResponse.success("Verified Sucessfully");
+        return CommonResponse.success("OTP verified successfully");
     }
 
     public boolean isEmailVerified(String email) {
@@ -70,11 +75,17 @@ public class OtpService {
                 .map(EmailOtp::isVerified)
                 .orElse(false);
     }
-    public boolean isOtpVerified(String email, OtpType otpType) {
-        EmailOtp otp = emailOtpRepository.findByEmailAndOtpType(email, otpType)
-                .orElseThrow(() -> new RuntimeException("Verify otp first"));
-        return otp.isVerified();
-    }
 
+    public boolean isOtpVerified(String email, OtpType otpType) {
+        return emailOtpRepository.findByEmailAndOtpType(email, otpType)
+                .map(EmailOtp::isVerified)
+                .orElse(false);
+    }
+    @Transactional
+    public void deleteOtp(String email,OtpType otpType) {
+    emailOtpRepository.deleteByEmailAndOtpType(email, otpType);
+   		
+    }
 }
+
 

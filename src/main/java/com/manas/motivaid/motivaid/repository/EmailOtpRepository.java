@@ -1,5 +1,6 @@
 package com.manas.motivaid.motivaid.repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,5 +17,9 @@ public interface EmailOtpRepository extends JpaRepository<EmailOtp, Long> {
         OtpType otpType,
         String otp
     );
+//    Optional<EmailOtp>findByEmail(String email);
+    void deleteByCreatedAtBefore(LocalDateTime time);
+    void deleteByEmailAndOtpType(String email, OtpType otpType);
+
 }
 
