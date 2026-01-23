@@ -1,6 +1,7 @@
 package com.manas.motivaid.motivaid.model;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -43,9 +44,9 @@ public class StudentPreference {
 
     private Double gpa;
 
-    private int academicInterestIds;
-    private int testsCompleted;
-    private int fundingPlanId;
+    private List<String> academicInterestIds;
+    private String testsCompleted;
+    private List<String> fundingPlanId;
     private int collegeJourneyStageIds;
 }
 

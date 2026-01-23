@@ -1,6 +1,7 @@
 package com.manas.motivaid.motivaid.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.Data;
 
@@ -17,8 +18,8 @@ public class StudentPreferenceRequest {
 	    private LocalDate highSchoolGraduationDate;
 	    private Boolean firstGenStudent;
 	    private Double gpa;
-	    private String academicInterestIds;
+	    private List<String> academicInterestIds;
 	    private String testsCompleted;
-	    private String fundingPlanId;
-	    private String collegeJourneyStageIds;
+	    private List<String> fundingPlanId;
+	    private int collegeJourneyStageIds;
 }

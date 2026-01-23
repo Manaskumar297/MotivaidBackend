@@ -11,7 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.manas.motivaid.motivaid.dto.ChangePasswordRequest;
 import com.manas.motivaid.motivaid.dto.CommonResponse;
+import com.manas.motivaid.motivaid.dto.CounselorPreferenceRequest;
 import com.manas.motivaid.motivaid.dto.LoginRequest;
+import com.manas.motivaid.motivaid.dto.StudentPreferenceRequest;
+import com.manas.motivaid.motivaid.model.CounselorPreference;
+import com.manas.motivaid.motivaid.service.PreferenceService;
 import com.manas.motivaid.motivaid.service.UserService;
 
 @RestController
@@ -20,6 +24,8 @@ public class UserController {
 	
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private PreferenceService preferenceService;
 	
 	@DeleteMapping("/delete-user")
 	public CommonResponse deleteUser(@RequestBody LoginRequest request) {
@@ -29,6 +35,16 @@ public class UserController {
 	@PutMapping("/change-password")
 	public CommonResponse changepassword(@RequestBody ChangePasswordRequest request) {
 		return userService.changePassword(request);
+	}
+	
+	@PutMapping("/student-profile")
+	public StudentPreferenceRequest studentPreference(@RequestBody StudentPreferenceRequest request) {
+		return preferenceService.saveStudentPreference(request);
+	}
+	
+	@PutMapping("/counselor-profile")
+	public CounselorPreferenceRequest counselorPreference(@RequestBody CounselorPreferenceRequest request) {
+		return preferenceService.saveCounselorPreference(request);
 	}
 	
 }
