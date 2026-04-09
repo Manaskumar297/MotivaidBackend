@@ -37,14 +37,22 @@ public class UserController {
 		return userService.changePassword(request);
 	}
 	
-	@PutMapping("/student-profile")
+	@PutMapping("/upadte-student-profile")
 	public StudentPreferenceRequest studentPreference(@RequestBody StudentPreferenceRequest request) {
 		return preferenceService.saveStudentPreference(request);
 	}
+	@GetMapping("/get-student-profile")
+	public StudentPreferenceRequest getStudentPreference() {
+		return preferenceService.getStudentPreference();
+	}
 	
-	@PutMapping("/counselor-profile")
+	@PutMapping("/update-counselor-profile")
 	public CounselorPreferenceRequest counselorPreference(@RequestBody CounselorPreferenceRequest request) {
 		return preferenceService.saveCounselorPreference(request);
+	}
+	@GetMapping("/get-counselor-profile")
+	public CounselorPreferenceRequest getCounselorPreference() {
+		return preferenceService.getCounselorPreference();
 	}
 	
 }

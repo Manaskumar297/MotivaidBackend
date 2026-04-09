@@ -25,7 +25,6 @@ public class CounselorPreference {
 
     private String role_title;
     private Integer school_id;
-    private String certification;
     private String services_id;
     private String communication_prefer_id;
 }

@@ -58,6 +58,16 @@ public class PreferenceService {
          return mapToStudentPreferenceRequest(preference);
     }
     
+    public StudentPreferenceRequest getStudentPreference() {
+    	User user =getAuthenticatedUser();
+    	validateRole(user, "STUDENT");
+    	StudentPreference preference = studentPreferenceRepository.findByUser(user)
+    			.orElseThrow(()-> new RuntimeException("Student preference not found"));
+    	
+	    	return mapToStudentPreferenceRequest(preference);
+    	
+    }
+    
     public CounselorPreferenceRequest saveCounselorPreference(CounselorPreferenceRequest request) {
     	User user= getAuthenticatedUser();
     	validateRole(user, "COUNSELOR");
@@ -67,11 +77,19 @@ public class PreferenceService {
     	preference.setUser(user);
     	preference.setRole_title(request.getRole_title());
     	preference.setSchool_id(request.getSchool_id());
+    	preference.setServices_id(request.getServices_id());
     	preference.setCommunication_prefer_id(request.getCommunication_prefer_id());
     	counselorPreferenceRepository.save(preference);
     	
     	return mapToCounselorPreferenceRequest(preference);
     	
+    }
+    public CounselorPreferenceRequest getCounselorPreference() {
+    	User user=getAuthenticatedUser();
+    	validateRole(user, "COUNSELOR");
+    	CounselorPreference preference=counselorPreferenceRepository.findByUser(user)
+    			.orElseThrow(()-> new RuntimeException("Counselor preference not found"));
+    	return mapToCounselorPreferenceRequest(preference);
     }
     
     private User getAuthenticatedUser() {
