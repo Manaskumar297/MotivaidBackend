@@ -97,7 +97,6 @@ public class PreferenceService {
     	
     	return userRepository.findByEmailId(email)
     			.orElseThrow(()-> new ResponseStatusException(HttpStatus.BAD_REQUEST,"User not found"));
-    
     	
     }
     
