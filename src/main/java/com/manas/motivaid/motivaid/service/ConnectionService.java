@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,10 +36,25 @@ public class ConnectionService {
 	
 	public List<GetConnectionsResponse> getAllUsers(){
 		User currentUser=authService.getAuthenticatedUser();
+		String currentUserRole=currentUser.getRoles().iterator().next().getName();
 		
-				List<User>users=userRepository.findAll();
+		List<User> users;
+		if (currentUserRole.equals("STUDENT")) {
 			
+			Role counselorRole= roleRepository.findByName("COUNSELOR")
+					.orElseThrow(()-> new ResponseStatusException(HttpStatus.BAD_REQUEST,"Role not found"));
+			
+			users= userRepository.findByRolesContaining(counselorRole);
+			
+		}else if (currentUserRole.equals("COUNSELOR")) {
+			users=userRepository.findAll();
+			
+		}else {
+			users=userRepository.findAll();
+		}
+					
 				List<Connection> connectionStatus=connectionRepository.findByFromUserOrToUser(currentUser, currentUser);
+				
 				List<GetConnectionsResponse> response = new ArrayList<>();
 				 for (User user : users) {
 
@@ -50,16 +66,13 @@ public class ConnectionService {
 			            String status = "NONE";
 
 			            for (Connection connection :connectionStatus ) {
-			                System.out.println("connectionStatusData1");
 
 			                // Current user sent request
 			                if (connection.getFromUser().getId().equals(currentUser.getId())
 			                        && connection.getToUser().getId().equals(user.getId())) {
-				                System.out.println("connectionStatusData2");
 
 
 			                    if (connection.getStatus() == ConnectionStatus.PENDING) {
-					                System.out.println("connectionStatusData3");
 
 			                        status = "REQUEST_SENT";
 			                    }
@@ -74,17 +87,14 @@ public class ConnectionService {
 			                // Current user received request
 			                else if (connection.getToUser().getId().equals(currentUser.getId())
 			                        && connection.getFromUser().getId().equals(user.getId())) {
-				                System.out.println("connectionStatusData5");
 
 
 			                    if (connection.getStatus() == ConnectionStatus.PENDING) {
-					                System.out.println("connectionStatusData6");
 
 			                        status = "REQUEST_RECEIVED";
 			                    }
 
 			                    else if (connection.getStatus() == ConnectionStatus.ACCEPTED) {
-					                System.out.println("connectionStatusData7");
 
 			                        status = "CONNECTED";
 			                    }
