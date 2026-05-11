@@ -11,4 +11,5 @@ import com.manas.motivaid.motivaid.model.User;
 public interface ConnectionRepository extends JpaRepository<Connection, Long>{
 	List<Connection> findByFromUserOrToUser(User fromUser, User toUser);
 	
+	
 }
