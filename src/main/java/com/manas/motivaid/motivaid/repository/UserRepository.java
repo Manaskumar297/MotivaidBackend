@@ -12,5 +12,7 @@ import com.manas.motivaid.motivaid.model.User;
 public interface UserRepository extends JpaRepository<User,Long> {
 	Optional<User> findByEmailId(String email_id);
 	Page<User> findByRolesContaining(Role role,Pageable pageable);
+	Optional<User>findById(Long UserId);
+	
 }
  

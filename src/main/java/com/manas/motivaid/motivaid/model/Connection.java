@@ -1,5 +1,7 @@
 package com.manas.motivaid.motivaid.model;
 
+import java.time.LocalDateTime;
+
 import com.manas.motivaid.motivaid.enums.ConnectionStatus;
 
 import jakarta.persistence.Column;
@@ -34,5 +36,7 @@ public class Connection  {
 	@Enumerated(EnumType.STRING)
     @Column(nullable = false)
 	private ConnectionStatus status;
+	  @Column(updatable = false)
+	    private LocalDateTime createdDatetime;
 	
 }

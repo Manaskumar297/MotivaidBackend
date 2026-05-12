@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class GetConnectionsResponse {
-	
+
 	private Long user_id;
 	private String user_role ;
 	private String first_name;
