@@ -15,9 +15,9 @@ public class EmailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Email Verification OTP");
+        message.setSubject("Motivaid Email Verification OTP");
         message.setText(
-                "Your OTP for email verification is: " + otp +
+                "Your OTP for email verification on Motivaid  is: " + otp +
                 "\n\nThis OTP will expire in 10 minutes."
         );
 
