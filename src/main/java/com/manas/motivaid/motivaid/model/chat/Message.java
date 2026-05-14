@@ -1,11 +1,11 @@
 package com.manas.motivaid.motivaid.model.chat;
 
-import java.awt.TrayIcon.MessageType;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.manas.motivaid.motivaid.enums.MessageStatus;
+import com.manas.motivaid.motivaid.enums.MessageType;
 import com.manas.motivaid.motivaid.model.User;
 
 import jakarta.persistence.Column;
